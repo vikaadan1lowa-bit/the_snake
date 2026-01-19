@@ -70,8 +70,7 @@ class Apple(GameObject):
         такие как его позиция и цвет.
         """
         super().__init__(position, body_color)
-        if occupied_position is None:
-            occupied_position = []
+        occupied_position = occupied_position or []
         self.randomize_position(occupied_position)
 
     def randomize_position(self, occupied_position):
@@ -98,6 +97,7 @@ class Snake(GameObject):
         """Инициализирует базовые атрибуты змейки."""
         super().__init__(position, body_color)
         self.reset()
+        self.direction = RIGHT
         self.next_direction = None
         self.last = None
 
@@ -118,8 +118,11 @@ class Snake(GameObject):
         new_x = (x + dx * GRID_SIZE) % SCREEN_WIDTH
         new_y = (y + dy * GRID_SIZE) % SCREEN_HEIGHT
         self.positions.insert(0, (new_x, new_y))
-        if len(self.positions) > self.length:
-            self.last = self.positions.pop()
+        self.last = (
+            self.positions.pop()
+            if len(self.positions) > self.length
+            else None
+        )
 
     def draw(self):
         """Отрисовывает змейку на игровой поверхности."""
@@ -133,7 +136,7 @@ class Snake(GameObject):
     def reset(self):
         """Сбрасывает змейку в начальное состояние."""
         self.length = 1
-        self.positions = [SCREEN_CENTER]
+        self.positions = [self.position]
         self.direction = choice([UP, DOWN, LEFT, RIGHT])
         self.last = None
 
